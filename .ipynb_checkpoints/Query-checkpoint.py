@@ -1,5 +1,5 @@
 import sqlite3
-from sqlite3 import Connection, Cursor
+from sqlite3 import Connection, Cursor, OperationalError
 from typing import Any, Literal
 
 
@@ -52,7 +52,7 @@ class SqliteDatabase:
         columns_headers: tuple[str, ...] = tuple(str(col[0]) for col in results.description)
 
         lines: tuple[tuple[str, ...], ...] = tuple((columns_headers, *rows))
-
+        
         if return_rows == "tuple":
             return lines
         elif return_rows is None:
@@ -70,7 +70,7 @@ class SqliteDatabase:
                 column_widths.append(max(widths))
 
             # Printing column headers
-            border_top_bottom = "+" + "-" * (sum(column_widths) + 3 * len(column_widths) - 1) + "+"
+            border_top_bottom = "+" + "-" * (sum(column_widths) + 3 * len(column_widths) - 1)  + "+"
             print(border_top_bottom)
             print("| ", end="")
             for idx, col_label in enumerate(lines[0]):
@@ -78,8 +78,7 @@ class SqliteDatabase:
             print()
             print(border_top_bottom)
 
-
-            for row in rows:
+            for row in rows[1:]:
                 print("| ", end="")
                 for idx, col_val in enumerate(row):
                     print(str(col_val).ljust(column_widths[idx]), end=" | ")
@@ -87,3 +86,13 @@ class SqliteDatabase:
 
             print(border_top_bottom)
             return None
+
+
+def main():
+    with SqliteDatabase("example.db") as query:
+        query("select count(*) as 'wwwwwwweadaeeeeeeeeeeeeeeeeeeeeeeee', date() from item group by item_id")
+        query("select count(*) as 'eeeeee', date(), time(date()) from item group by item_id")
+
+
+if __name__ == "__main__":
+    main()
