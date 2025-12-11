@@ -114,3 +114,67 @@ with SqliteDatabase("example.db") as query:
 
         query(f"insert into {post_name} values" + ",".join(rows), is_updation=True)
         query(f"select * from {post_name} limit 10", table_heading=post_name)
+
+
+################################
+
+# candidate popularity trends - comparing candidate performances across classes
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.ticker import MultipleLocator
+
+
+def plot_popularity_trends(post_name: str, post_df: pd.DataFrame):
+    # extracting rows belonging to a particular class from the post's dataframe using regular expressions
+    class_wise_dataframes = [
+        post_df[post_df.index.str.contains(_re)]
+        for _re in [r"9\w", r"10\w", r"11\w", r"12\w"]  # <--- regex btw
+    ]
+
+    # dividing the plot into 4 subplots
+    fig, axes = plt.subplots(2, 2, figsize=(15, 7))
+
+    subplot_positions = [
+        (0, 0),
+        (0, 1),
+        (1, 0),
+        (1, 1),
+    ]  # since there are only 4 classes / subplots
+    linestyles = [":", "-", "--", "-.", "solid"]
+
+    for idx in range(4):
+        pos = subplot_positions[idx]
+        class_df = class_wise_dataframes[idx]
+        sections = class_df.index
+
+        for idx, (candidate_name, candidate_series) in enumerate(class_df.items()):
+            # plotting a subplot for each class
+            axes[pos].plot(
+                sections,
+                candidate_series,
+                label=candidate_name.replace("_", " "),  # type: ignore
+                linestyle=linestyles[idx],
+            )
+
+        axes[pos].set_xlabel("class")
+        axes[pos].set_ylabel("Votes")
+
+        # axes[pos].set_ylim(0, post_df.max().max() + 1)
+
+        # values on y-axis would have a difference of 2
+        axes[pos].yaxis.set_major_locator(MultipleLocator(2))
+
+    fig.suptitle(post_name, fontsize=32)
+
+    # setting a common legend for the whole plot
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", ncols=2, fontsize=15)
+
+    plt.show()
+
+
+plot_popularity_trends("Captain Boy", cb)
+plot_popularity_trends("Captain Girl", cg)
+plot_popularity_trends("Vice Captain Boy", vcb)
+plot_popularity_trends("Vice Captain Girl", vcg)
