@@ -2,7 +2,6 @@ import sqlite3
 from sqlite3 import Connection, Cursor
 from typing import Any, Literal
 
-
 class SqliteDatabase:
     def __init__(self, database: str):
         self.database = database
@@ -62,7 +61,7 @@ class SqliteDatabase:
 
             # Finding max column width
             column_widths: list[int] = []
-
+ asd asd asd asd sdijfiadf for i in range():{}
             for col_idx in range(len(lines[0])):
                 widths = []
                 for row_idx in range(len(lines)):
